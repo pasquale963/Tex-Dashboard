@@ -12,10 +12,12 @@ header{position:sticky;top:0;z-index:20;background:#111827;color:#fff;padding:16
 main{max-width:1120px;margin:auto;padding:16px}.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:13px}.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.stat b{display:block;font-size:21px}.stat span{font-size:11px;color:var(--muted)}
 .filters{background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:13px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:9px}
 input,select,textarea{font:inherit;width:100%;border:1px solid #d0d5dd;border-radius:10px;padding:10px;background:#fff}button{font:inherit;border:0;border-radius:10px;padding:10px 13px;font-weight:750;cursor:pointer}.primary{background:var(--accent);color:#fff}.ghost{background:#eef2f6;color:#17202a}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:11px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;cursor:pointer;transition:.12s}.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px #0001}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:11px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;cursor:pointer;transition:.12s;overflow:hidden}.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px #0001}
+.cardcover{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:11px;background:#eef2f6;display:block;margin-bottom:9px}.coverlink{font-size:11px;margin:5px 0 8px}
 .num{font-size:12px;color:var(--muted)}.title{font-weight:800;font-size:17px;margin:5px 0 10px}.meta{font-size:12px;color:#4b5563;display:flex;justify-content:space-between;gap:8px}.badge{display:inline-block;margin-top:10px;padding:4px 8px;border-radius:999px;background:#ecfdf3;color:#047857;font-size:10px;font-weight:800}.note{margin-top:9px;font-size:12px;color:#475467;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .empty{padding:35px;text-align:center;color:var(--muted);background:#fff;border-radius:16px;border:1px dashed #cbd5e1}
-dialog{width:min(760px,calc(100% - 20px));border:0;border-radius:18px;padding:0;box-shadow:0 20px 70px #0005}dialog::backdrop{background:#0008}.modal{padding:20px}.modal h2{margin:0 0 3px}.modal .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.modal label{display:block;font-size:11px;font-weight:800;color:#475467;margin-bottom:4px}.actions{display:flex;justify-content:space-between;gap:8px;margin-top:15px}.actions-right{display:flex;gap:8px}.coverbox{background:#f2f4f7;border-radius:12px;padding:10px;margin:12px 0;font-size:12px;color:#667085}
+dialog{width:min(760px,calc(100% - 20px));border:0;border-radius:18px;padding:0;box-shadow:0 20px 70px #0005}dialog::backdrop{background:#0008}.modal{padding:20px}.modal h2{margin:0 0 3px}.modal .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.modal label{display:block;font-size:11px;font-weight:800;color:#475467;margin-bottom:4px}.actions{display:flex;justify-content:space-between;gap:8px;margin-top:15px}.actions-right{display:flex;gap:8px}.coverbig{width:100%;max-height:70vh;object-fit:contain;background:#f2f4f7;border-radius:12px;margin:12px 0}
 .help{margin:14px 0;padding:14px;background:#fff;border:1px solid var(--line);border-radius:15px}.help b{display:block;margin-bottom:4px}
 @media(max-width:800px){.stats{grid-template-columns:repeat(3,1fr)}.filters{grid-template-columns:1fr 1fr}.filters input{grid-column:1/-1}.filters button{grid-column:1/-1}.grid{grid-template-columns:1fr 1fr}}
 @media(max-width:460px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.modal .row{grid-template-columns:1fr}.top{align-items:flex-start}}
@@ -34,44 +36,82 @@ dialog{width:min(760px,calc(100% - 20px));border:0;border-radius:18px;padding:0;
 <button class="ghost" onclick="resetFilters()">Azzera</button>
 </section>
 <div id="grid" class="grid"></div>
-<section class="help"><b>💡 Consiglio</b> Clicca un albo per aprire la sua scheda. Il campo <b>Note personali</b> è pensato proprio per aggiungere a mano prezzo pagato, prezzo richiesto, particolarità, provenienza o qualsiasi altra informazione. Le modifiche restano memorizzate nel browser del dispositivo.</section>
+<section class="help"><b>💡 Consiglio</b> Clicca un albo per aprire la sua scheda. Il campo <b>Note personali</b> serve per prezzo, condizioni, provenienza e qualsiasi altra annotazione. Le modifiche restano memorizzate sul dispositivo.</section>
 </main>
 
 <dialog id="dlg"><div class="modal">
 <h2 id="mTitle"></h2><div id="mSub" class="num"></div>
-<div class="coverbox">🖼️ <b>Copertina</b> — predisposta per essere collegata in futuro. Per ora la scheda usa il riferimento ai dati del catalogo.</div>
+<img id="mCover" class="coverbig" alt="Copertina" loading="lazy" onerror="this.style.display='none'">
+<div class="coverlink"><a id="mCoverLink" target="_blank" rel="noopener">Apri la pagina dell'albo e guarda la copertina</a></div>
 <div class="row"><div><label>Data / anno</label><input id="mDate"></div><div><label>Prezzo annotato sul catalogo</label><input id="mPaperPrice"></div></div>
 <div class="row"><div><label>Edizione / ristampa</label><input id="mEdition" placeholder="es. 1ª edizione"></div><div><label>Condizione</label><input id="mCondition" placeholder="es. Ottima, buona…"></div></div>
 <div class="row"><div><label>Prezzo pagato / personale</label><input id="mPersonalPrice" placeholder="es. 45 €"></div><div><label>Prezzo richiesto / valutazione</label><input id="mPurchasePrice" placeholder="es. 80 €"></div></div>
-<div><label>Note personali</label><textarea id="mNotes" rows="5" placeholder="Scrivi qui tutto ciò che vuoi ricordare: prezzo, provenienza, difetti, firma, variante, acquisto, ecc."></textarea></div>
+<div><label>Note personali</label><textarea id="mNotes" rows="5" placeholder="Scrivi qui tutto ciò che vuoi ricordare…"></textarea></div>
 <div class="actions"><button class="ghost" onclick="dlg.close()">Chiudi</button><div class="actions-right"><button class="ghost" onclick="toggleOwned()">Segna in collezione / da acquistare</button><button class="primary" onclick="saveModal()">Salva</button></div></div>
 </div></dialog>
 
 <dialog id="help"><div class="modal">
 <h2>📖 Come usare Tex — La mia collezione</h2>
-<p><b>1. Cerca</b><br>Usa la barra in alto per cercare il numero (es. 25) oppure una parola del titolo.</p>
-<p><b>2. Filtra</b><br>Puoi restringere l'elenco per anno, edizione e stato della collezione.</p>
-<p><b>3. Apri un albo</b><br>Tocca una scheda. Si apre la pagina personale dell'albo.</p>
-<p><b>4. Aggiungi informazioni</b><br>Inserisci edizione, condizione, prezzo pagato, valutazione e soprattutto le tue <b>Note personali</b>. Salva: i dati restano sul dispositivo.</p>
-<p><b>5. Esporta</b><br>Il pulsante “Esporta” crea un file JSON di sicurezza con tutti i dati attuali. Conserva periodicamente una copia.</p>
-<p><b>6. Su iPhone</b><br>Apri la dashboard con Safari → Condividi → <b>Aggiungi alla schermata Home</b>. Potrai usarla come una piccola app.</p>
-<p><b>7. In futuro</b><br>Quando vorrai, potremo importare le altre centinaia di pagine del catalogo e completare progressivamente numeri, ristampe, copertine e annotazioni.</p>
+<p><b>1. Cerca</b> numero o titolo nella barra.</p>
+<p><b>2. Filtra</b> per anno, edizione e stato della collezione.</p>
+<p><b>3. Apri un albo</b> toccando la scheda: trovi copertina, dati e note personali.</p>
+<p><b>4. Salva le tue annotazioni</b>: prezzo, condizione, edizione e note.</p>
+<p><b>5. Esporta</b> crea un backup JSON.</p>
+<p><b>6. Copertine</b>: il catalogo usa le pagine degli albi di ComicsBox come fonte visiva; se una copertina non si carica nella scheda, il pulsante sotto l'immagine apre direttamente la pagina dell'albo.</p>
 <div class="actions"><button class="primary" onclick="help.close()">Ho capito</button></div>
 </div></dialog>
 
 <script>
 let items=[],current=null;
 const $=id=>document.getElementById(id);
-async function init(){items=JSON.parse(localStorage.getItem('texCollection')||'null')||await (await fetch('data.json')).json();populateYears();render()}
+async function init(){
+  items=JSON.parse(localStorage.getItem('texCollection')||'null')||await (await fetch('data.json')).json();
+  await enrichCatalog();
+  populateYears(); render();
+}
+async function enrichCatalog(){
+  try{
+    const url='https://it.wikipedia.org/w/api.php?action=parse&page=Albi_di_Tex&prop=text&format=json&origin=*';
+    const r=await fetch(url); const j=await r.json();
+    const html=j?.parse?.text?.['*']; if(!html) return;
+    const doc=new DOMParser().parseFromString(html,'text/html'), map={};
+    doc.querySelectorAll('table').forEach(t=>t.querySelectorAll('tr').forEach(tr=>{
+      const c=tr.querySelectorAll('td'); if(c.length<2)return;
+      const n=parseInt(c[0].textContent.trim(),10);
+      const title=c[1].textContent.replace(/\[[^\]]*\]/g,'').trim();
+      if(Number.isFinite(n)&&title) map[n]=title;
+    }));
+    items.forEach(x=>{
+      if(!x.title && map[x.number]) x.title=map[x.number];
+      if(!x.title) x.title='Tex #'+x.number;
+      if(!x.year && x.date) x.year=parseInt(String(x.date).slice(0,4))||'';
+      if(!x.cover) x.cover='https://image.thum.io/get/width/700/crop/1000/noanimate/https://www.comicsbox.it/albo/TEX_'+String(x.number).padStart(3,'0');
+      x.coverPage='https://www.comicsbox.it/albo/TEX_'+String(x.number).padStart(3,'0');
+    });
+    localStorage.setItem('texCollection',JSON.stringify(items));
+  }catch(e){
+    items.forEach(x=>{
+      if(!x.title)x.title='Tex #'+x.number;
+      if(!x.cover)x.cover='https://image.thum.io/get/width/700/crop/1000/noanimate/https://www.comicsbox.it/albo/TEX_'+String(x.number).padStart(3,'0');
+      x.coverPage='https://www.comicsbox.it/albo/TEX_'+String(x.number).padStart(3,'0');
+    });
+  }
+}
 function populateYears(){let ys=[...new Set(items.map(x=>x.year).filter(Boolean))].sort((a,b)=>a-b);$('year').innerHTML='<option value="">Tutti gli anni</option>'+ys.map(y=>`<option>${y}</option>`).join('')}
 function populateEditions(){let es=[...new Set(items.map(x=>x.edition).filter(Boolean))];$('edition').innerHTML='<option value="">Tutte le edizioni</option>'+es.map(x=>`<option>${esc(x)}</option>`).join('')}
-function render(){populateEditions();let q=$('q').value.toLowerCase().trim(),y=$('year').value,e=$('edition').value,o=$('ownedFilter').value;
-let a=items.filter(x=>(!q||String(x.number).includes(q)||String(x.title).toLowerCase().includes(q))&&(!y||String(x.year)==y)&&(!e||x.edition==e)&&(!o||(o==='yes'?x.owned:!x.owned)));
-$('total').textContent=items.length;$('owned').textContent=items.filter(x=>x.owned).length;$('years').textContent=new Set(items.map(x=>x.year)).size;$('matches').textContent=a.length;$('notes').textContent=items.filter(x=>x.notes||x.personalPrice||x.purchasePrice).length;
-$('grid').innerHTML=a.length?a.map(x=>`<article class="card" onclick="openModal(${x.number})"><div class="num">TEX #${x.number} · ${esc(x.date||'')}</div><div class="title">${esc(x.title)}</div><div class="meta"><span>${esc(x.edition||'Da catalogare')}</span><span>${esc(x.paperPrice||'')}</span></div>${x.owned?'<span class="badge">IN COLLEZIONE</span>':(x.title?'<span class="badge" style="background:#fff7ed;color:#c2410c">DA ACQUISTARE</span>':'<span class="badge" style="background:#f2f4f7;color:#475467">DA CATALOGARE</span>')}${x.notes||x.personalPrice||x.purchasePrice?`<div class="note">📝 ${esc(x.notes||'Dati personali inseriti')}</div>`:''}</article>`).join(''):'<div class="empty">Nessun albo corrisponde ai filtri.</div>'}
-function openModal(n){current=items.find(x=>x.number===n);$('mTitle').textContent=`TEX #${current.number} — ${current.title}`;$('mSub').textContent=`${current.year||''} · ${current.date||''}`;$('mDate').value=current.date||'';$('mPaperPrice').value=current.paperPrice||'';$('mEdition').value=current.edition||'';$('mCondition').value=current.condition||'';$('mPersonalPrice').value=current.personalPrice||'';$('mPurchasePrice').value=current.purchasePrice||'';$('mNotes').value=current.notes||'';$('dlg').showModal()}
+function render(){
+  populateEditions();let q=$('q').value.toLowerCase().trim(),y=$('year').value,e=$('edition').value,o=$('ownedFilter').value;
+  let a=items.filter(x=>(!q||String(x.number).includes(q)||String(x.title).toLowerCase().includes(q))&&(!y||String(x.year)==y)&&(!e||x.edition==e)&&(!o||(o==='yes'?x.owned:!x.owned)));
+  $('total').textContent=items.length;$('owned').textContent=items.filter(x=>x.owned).length;$('years').textContent=new Set(items.map(x=>x.year).filter(Boolean)).size;$('matches').textContent=a.length;$('notes').textContent=items.filter(x=>x.notes||x.personalPrice||x.purchasePrice).length;
+  $('grid').innerHTML=a.length?a.map(x=>`<article class="card" onclick="openModal(${x.number})"><img class="cardcover" src="${esc(x.cover||'')}" alt="Copertina Tex #${x.number}" loading="lazy" onerror="this.style.display='none'"><div class="num">TEX #${x.number} · ${esc(x.date||'')}</div><div class="title">${esc(x.title)}</div><div class="meta"><span>${esc(x.edition||'Da catalogare')}</span><span>${esc(x.paperPrice||'')}</span></div>${x.owned?'<span class="badge">IN COLLEZIONE</span>':'<span class="badge" style="background:#fff7ed;color:#c2410c">DA ACQUISTARE</span>'}${x.notes||x.personalPrice||x.purchasePrice?`<div class="note">📝 ${esc(x.notes||'Dati personali inseriti')}</div>`:''}</article>`).join(''):'<div class="empty">Nessun albo corrisponde ai filtri.</div>';
+}
+function openModal(n){
+  current=items.find(x=>x.number===n);$('mTitle').textContent=`TEX #${current.number} — ${current.title}`;$('mSub').textContent=`${current.year||''} · ${current.date||''}`;
+  $('mCover').style.display='block';$('mCover').src=current.cover||'';$('mCoverLink').href=current.coverPage||('https://www.comicsbox.it/albo/TEX_'+String(current.number).padStart(3,'0'));
+  $('mDate').value=current.date||'';$('mPaperPrice').value=current.paperPrice||'';$('mEdition').value=current.edition||'';$('mCondition').value=current.condition||'';$('mPersonalPrice').value=current.personalPrice||'';$('mPurchasePrice').value=current.purchasePrice||'';$('mNotes').value=current.notes||'';$('dlg').showModal();
+}
 function saveModal(){Object.assign(current,{date:$('mDate').value,paperPrice:$('mPaperPrice').value,year:parseInt(($('mDate').value||'0000').slice(0,4))||current.year,edition:$('mEdition').value,condition:$('mCondition').value,personalPrice:$('mPersonalPrice').value,purchasePrice:$('mPurchasePrice').value,notes:$('mNotes').value});localStorage.setItem('texCollection',JSON.stringify(items));$('dlg').close();populateYears();render()}
-function toggleOwned(){current.owned=!current.owned;localStorage.setItem('texCollection',JSON.stringify(items));openModal(current.number);render()}
+function toggleOwned(){current.owned=!current.owned;localStorage.setItem('texCollection',JSON.stringify(items));render();openModal(current.number)}
 function resetFilters(){$('q').value='';$('year').value='';$('edition').value='';$('ownedFilter').value='';render()}
 function exportData(){let blob=new Blob([JSON.stringify(items,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tex-collezione-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function openHelp(){$('help').showModal()}
