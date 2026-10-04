@@ -1,0 +1,14 @@
+TEX — LA MIA COLLEZIONE — VERSIONE 3
+
+La dashboard contiene già tutte le 811 posizioni della serie regolare Tex.
+I primi 30 numeri sono trascritti dalla foto fornita.
+Dal n. 31 al n. 811 le schede sono già presenti ma non compilate.
+
+File:
+- index.html — dashboard
+- data.json — database completo 1–811
+- Guida_Tex_Dashboard.pdf — manuale
+- manifest.json/service-worker.js — supporto web-app
+- assets/database-cartaceo.jpg — foto di riferimento
+
+Importante: non sono stati inventati titoli o altri dati per i numeri non visibili nella foto.

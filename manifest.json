@@ -1,0 +1,9 @@
+{
+  "name": "Tex — La mia collezione",
+  "short_name": "Tex",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f1ea",
+  "theme_color": "#111827",
+  "lang": "it"
+}
